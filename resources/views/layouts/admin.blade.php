@@ -18,6 +18,8 @@
 
     <!-- Styles -->
     <link href="{{ asset('css/sb-admin-2.min.css') }}" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
     <!-- DataTables CSS for responsive design -->
 
     <!-- Favicon -->
@@ -49,13 +51,13 @@
             </li>
 
             <li class="nav-item {{ Nav::isRoute('brands.index') }}">
-                <a class="nav-link" href="{{ route('vehicles.index') }}">
+                <a class="nav-link" href="{{ route('brands.index') }}">
                     <i class="fas fa-fw fa-tag"></i>
                     <span>{{ __('Brand') }}</span></a>
             </li>
 
             <li class="nav-item {{ Nav::isRoute('categories.index') }}">
-                <a class="nav-link" href="{{ route('vehicles.index') }}">
+                <a class="nav-link" href="{{ route('categories.index') }}">
                     <i class="fas fa-fw fa-list"></i>
                     <span>{{ __('Kategori') }}</span></a>
             </li>
@@ -190,6 +192,7 @@
     <script src="{{ asset('vendor/bootstrap/js/bootstrap.min.js') }}"></script>
     <script src="{{ asset('vendor/jquery-easing/jquery.easing.min.js') }}"></script>
     <script src="{{ asset('js/sb-admin-2.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 
 </body>

@@ -8,7 +8,6 @@ use App\Models\Brand;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use App\Models\Vehicle;
-use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 
@@ -28,21 +27,15 @@ class VehicleController extends Controller
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
 
-        $query = Vehicle::with('brands', 'categories');
+        $query = Vehicle::with('brand', 'category');
 
-        // Search by name
         if ($search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', '%' . $search . '%');
-            });
+            $query->where('title', 'like', '%' . $search . '%');
         }
 
-        // Filter by date range
         if ($startDate && $endDate) {
-            $query->whereBetween('created_at', [
-                Carbon::parse($startDate)->startOfDay(),
-                Carbon::parse($endDate)->endOfDay()
-            ]);
+            $query->whereDate('created_at', '>=', $startDate)
+                ->whereDate('created_at', '<=', $endDate);
         } elseif ($startDate) {
             $query->whereDate('created_at', '>=', $startDate);
         } elseif ($endDate) {
@@ -72,23 +65,19 @@ class VehicleController extends Controller
         $data = $request->all();
         $data['slug'] = Str::slug($data['name']);
 
-        if ($request->hasFile('thumbnail')) {
-            $data['thumbnail'] = $request->file('thumbnail')->store('thumbnails', 'public');
-        }
-
+        $images = [];
         if ($request->hasFile('images')) {
-            $imagePaths = [];
             foreach ($request->file('images') as $image) {
-                $path = $image->store('vehicle_images', 'public');
-                $imagePaths[] = $path;
+                $images[] = $image->store('images', 'public');
             }
-            $data['images'] = json_encode($imagePaths);
         }
+        $data['images'] = json_encode($images); // Simpan sebagai JSON
 
         Vehicle::create($data);
 
         return redirect()->route('admin.vehicles.index')->with('success', 'Vehicle created successfully.');
     }
+
 
     /**
      * Display the specified resource.
@@ -115,46 +104,35 @@ class VehicleController extends Controller
         $data = $request->all();
         $data['slug'] = Str::slug($data['name']);
 
-        if ($request->hasFile('thumbnail')) {
-            if ($vehicle->thumbnail) {
-                Storage::disk('public')->delete($vehicle->thumbnail);
-            }
-            $data['thumbnail'] = $request->file('thumbnail')->store('thumbnails', 'public');
-        }
-
+        $images = json_decode($vehicle->images, true) ?? [];
         if ($request->hasFile('images')) {
-            if ($vehicle->images) {
-                foreach (json_decode($vehicle->images) as $imagePath) {
-                    Storage::disk('public')->delete($imagePath);
-                }
+            foreach ($images as $image) {
+                Storage::disk('public')->delete($image);
             }
-            $imagePaths = [];
+
+            $images = [];
             foreach ($request->file('images') as $image) {
-                $path = $image->store('vehicle_images', 'public');
-                $imagePaths[] = $path;
+                $images[] = $image->store('images', 'public');
             }
-            $data['images'] = json_encode($imagePaths);
         }
+        $data['images'] = json_encode($images);
 
         $vehicle->update($data);
 
         return redirect()->route('admin.vehicles.index')->with('success', 'Vehicle updated successfully.');
     }
 
+
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(Vehicle $vehicle)
     {
-        if ($vehicle->thumbnail) {
-            Storage::disk('public')->delete($vehicle->thumbnail);
+        if ($vehicle->images) {
+            Storage::disk('public')->delete($vehicle->images);
         }
 
-        if ($vehicle->images) {
-            foreach (json_decode($vehicle->images) as $imagePath) {
-                Storage::disk('public')->delete($imagePath);
-            }
-        }
+
 
         $vehicle->delete();
 

@@ -26,5 +26,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'admin@superadmin.com',
             'is_admin' => true,
         ]);
+
+        $this->call(CategorySeeder::class);
     }
 }

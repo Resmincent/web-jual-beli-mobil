@@ -15,9 +15,11 @@ class Vehicle extends Model
         'description',
         'price',
         'images',
-        'thumbnail',
         'category_id',
         'brand_id',
+        'year',
+        'model',
+        'mileage',
     ];
 
     public function brands()

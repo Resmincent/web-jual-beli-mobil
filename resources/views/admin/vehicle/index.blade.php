@@ -25,31 +25,32 @@
 
 <div class="card">
     <div class="card-body">
-        <div class="row">
+        <div class="row mb-4">
             <div class="col-lg-6">
-                <form method="GET" action="{{ route('vehicles.index') }}" class="mb-4">
-                    <div class="input-group">
-                        <input type="text" name="search" class="form-control form-control" placeholder="{{ __('Search users...') }}" value="{{ request()->input('search') }}">
-                        <button type="submit" class="btn btn-primary btn-sm">{{ __('Search') }}</button>
-                    </div>
+                <form method="GET" action="{{ route('vehicles.index') }}" class="d-flex">
+                    <input type="text" name="search" class="form-control form-control-sm mr-2" placeholder="{{ __('Search vehicles...') }}" value="{{ request()->input('search') }}">
+                    <button type="submit" class="btn btn-primary btn-sm">{{ __('Search') }}</button>
                 </form>
             </div>
-            <div class="col-lg-2">
-                <label for="startDate">Start Date</label>
-                <div class="form-group">
-                    <input type="date" name="start_date" class="form-control" id="startDate" value="{{ request()->input('start_date') }}">
-                </div>
-            </div>
-            <div class="col-lg-2">
-                <label for="endDate">End Date</label>
-                <div class="form-group">
-                    <input type="date" name="end_date" class="form-control" id="endDate" placeholder="End Date" value="{{ request()->input('end_date') }}">
-                </div>
-            </div>
-            <div class="col-lg-2">
+            <div class="col-lg-6 d-flex justify-content-end">
                 <a href="{{ route('vehicles.create') }}" class="btn btn-md btn-primary">
                     Tambah Kendaraan
                 </a>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-lg-3">
+                <label for="startDate">Start Date</label>
+                <div class="form-group">
+                    <input type="date" name="start_date" class="form-control form-control-sm" id="startDate" value="{{ request()->input('start_date') }}">
+                </div>
+            </div>
+            <div class="col-lg-3">
+                <label for="endDate">End Date</label>
+                <div class="form-group">
+                    <input type="date" name="end_date" class="form-control form-control-sm" id="endDate" placeholder="End Date" value="{{ request()->input('end_date') }}">
+                </div>
             </div>
         </div>
 
@@ -60,68 +61,42 @@
                     <tr class="text-start text-gray-500 fw-bold fs-7 text-uppercase">
                         <th class="min-w-100px">Nama</th>
                         <th class="min-w-100px">Brand</th>
+                        <th class="min-w-100px">Model</th>
                         <th class="min-w-100px">Kategori</th>
-                        <th class="min-w-100px">Price</th>
+                        <th class="min-w-100px">Tahun</th>
+                        <th class="min-w-100px">Harga</th>
                         <th class="min-w-100px">Tanggal Dibuat</th>
                         <th class="min-w-100px">Aksi</th>
                     </tr>
                     <!--end::Table row-->
                 </thead>
                 <tbody class="fw-semibold text-gray-600">
+                    @foreach ($vehicles as $vehicle)
                     <tr>
-                        <td>Tiger Nixon</td>
-                        <td>System Architect</td>
-                        <td>Edinburgh</td>
-                        <td>61</td>
-                        <td>$320,800</td>
-                        <td></td>
+                        <td>{{ $vehicle->title }}</td>
+                        <td>{{ $vehicle->brand->name }}</td>
+                        <td>{{ $vehicle->model }}</td>
+                        <td>{{ $vehicle->category->name }}</td>
+                        <td>{{ $vehicle->year }}</td>
+                        <td>{{ number_format($vehicle->price, 0, ',', '.') }}</td>
+                        <td>{{ $vehicle->created_at->format('d M Y') }}</td>
+                        <td>
+                            <a href="{{ route('vehicles.show', $vehicle->id) }}" class="btn btn-sm btn-primary">Detail</a>
+                            <a href="{{ route('vehicles.edit', $vehicle->id) }}" class="btn btn-sm btn-warning">Edit</a>
+                            <form action="{{ route('vehicles.destroy', $vehicle->id) }}" method="POST" class="d-inline">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Hapus</button>
+                            </form>
+                        </td>
                     </tr>
-                    <tr>
-                        <td>Garrett Winters</td>
-                        <td>Accountant</td>
-                        <td>Tokyo</td>
-                        <td>63</td>
-                        <td>$170,750</td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td>Ashton Cox</td>
-                        <td>Junior Technical Author</td>
-                        <td>San Francisco</td>
-                        <td>2009-01-12</td>
-                        <td>$86,000</td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td>Cedric Kelly</td>
-                        <td>Senior Javascript Developer</td>
-                        <td>Edinburgh</td>
-                        <td>22</td>
-                        <td>$433,060</td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td>Airi Satou</td>
-                        <td>Accountant</td>
-                        <td>Tokyo</td>
-                        <td>33</td>
-                        <td>$162,700</td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td>Brielle Williamson</td>
-                        <td>Integration Specialist</td>
-                        <td>New York</td>
-                        <td>61</td>
-                        <td>$372,000</td>
-                        <td></td>
-                    </tr>
+                    @endforeach
                 </tbody>
             </table>
         </div>
     </div>
     <div class="pagination justify-content-center mb-10">
-        {{-- {{ $users->appends(['search' => request()->input('search')])->links() }} --}}
+        {{ $vehicles->appends(['search' => request()->input('search'), 'start_date' => request()->input('start_date'), 'end_date' => request()->input('end_date')])->links() }}
     </div>
 
 </div>
