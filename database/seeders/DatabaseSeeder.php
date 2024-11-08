@@ -23,7 +23,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Admin',
             'last_name' => 'Admin',
             'password' => '@admin123',
-            'email' => 'admin@admin.com',
+            'email' => 'admin@superadmin.com',
             'is_admin' => true,
         ]);
     }

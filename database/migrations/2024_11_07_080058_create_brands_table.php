@@ -16,8 +16,6 @@ return new class extends Migration
             $table->string('name', 30);
             $table->string('slug', 30);
             $table->string('cover', 255);
-            $table->foreignId('category_id')->constrained('categories')->onDelete('cascade');
-            $table->foreignId('brand_id')->constrained('brands')->onDelete('cascade');
             $table->timestamps();
         });
     }
