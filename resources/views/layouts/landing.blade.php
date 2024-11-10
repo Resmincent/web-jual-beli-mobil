@@ -19,22 +19,53 @@
 
     <!-- Styles -->
     <link href="{{ asset('css/sb-admin-2.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/detail-kendaraan.css') }}" rel="stylesheet">
+
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
     <!-- DataTables CSS for responsive design -->
 
     <!-- Favicon -->
     <link href="{{ asset('img/favicon.png') }}" rel="icon" type="image/png">
+
+    <style>
+        .card-img-wrapper {
+            overflow: hidden;
+            position: relative;
+            padding-top: 75%;
+        }
+
+        .card-img-wrapper img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+            padding: 1rem;
+
+        }
+
+        card-img-top {
+            height: 200px;
+            object-fit: cover;
+            border-bottom: 1px solid #eee;
+        }
+
+    </style>
+
 </head>
 <body id="page-top">
 
     <!-- Page Wrapper -->
     <div id="wrapper">
-        <!-- Sidebar -->
-        <ul class="navbar-nav bg-gradient-secondary sidebar sidebar-dark accordion" id="accordionSidebar">
 
-            <!-- Sidebar - Brand -->
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ url('/home') }}">
+        @if(Route::currentRouteName() == 'landing')
+        <ul class="navbar-nav bg-gradient-secondary sidebar sidebar-dark accordion">
+
+            <!-- Brand -->
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ route('landing') }}">
                 <div class="sidebar-brand-icon rotate-n-15">
                     <i class="fas fa-car"></i>
                 </div>
@@ -44,50 +75,46 @@
             <!-- Divider -->
             <hr class="sidebar-divider my-0">
 
-            <!-- Nav Item - Kendaraan -->
-            <li class="nav-item {{ Nav::isRoute('vehicles.index') }}">
-                <a class="nav-link" href="{{ route('vehicles.index') }}">
-                    <i class="fas fa-fw fa-tachometer-alt"></i>
-                    <span>{{ __('Kendaraan') }}</span></a>
-            </li>
+            <!-- Filter Form -->
+            <div class="px-3 py-4">
+                <h4 class="text-white">Filter Pencarian</h4>
+                <form method="GET" action="{{ route('landing') }}">
 
-            <li class="nav-item {{ Nav::isRoute('brands.index') }}">
-                <a class="nav-link" href="{{ route('brands.index') }}">
-                    <i class="fas fa-fw fa-tag"></i>
-                    <span>{{ __('Brand') }}</span></a>
-            </li>
+                    <!-- Filter Berdasarkan Kategori -->
+                    <div class="form-group mb-3">
+                        <label for="category" class="text-white">Pilih Kategori:</label>
+                        <select name="category_id" id="category" class="form-control">
+                            <option value="">Semua Kategori</option>
+                            @foreach ($categories as $category)
+                            <option value="{{ $category->id }}" {{ request('category_id') == $category->id ? 'selected' : '' }}>
+                                {{ $category->name }}
+                            </option>
+                            @endforeach
+                        </select>
+                    </div>
 
-            <li class="nav-item {{ Nav::isRoute('categories.index') }}">
-                <a class="nav-link" href="{{ route('categories.index') }}">
-                    <i class="fas fa-fw fa-list"></i>
-                    <span>{{ __('Kategori') }}</span></a>
-            </li>
+                    <!-- Filter Berdasarkan Brand -->
+                    <div class="form-group mb-3">
+                        <label for="brand" class="text-white">Pilih Brand:</label>
+                        <select name="brand_id" id="brand" class="form-control">
+                            <option value="">Semua Merek</option>
+                            @foreach ($brands as $brand)
+                            <option value="{{ $brand->id }}" {{ request('brand_id') == $brand->id ? 'selected' : '' }}>
+                                {{ $brand->name }}
+                            </option>
+                            @endforeach
+                        </select>
+                    </div>
 
-            <!-- Divider -->
-            <hr class="sidebar-divider">
-
-            <!-- Heading -->
-            <div class="sidebar-heading">
-                {{ __('Settings') }}
-            </div>
-
-            <!-- Nav Item - Profile -->
-            <li class="nav-item {{ Nav::isRoute('profile') }}">
-                <a class="nav-link" href="{{ route('profile') }}">
-                    <i class="fas fa-fw fa-user"></i>
-                    <span>{{ __('Profile') }}</span>
-                </a>
-            </li>
-
-            <!-- Divider -->
-            <hr class="sidebar-divider d-none d-md-block">
-
-            <!-- Sidebar Toggler (Sidebar) -->
-            <div class="text-center d-none d-md-inline">
-                <button class="rounded-circle border-0" id="sidebarToggle"></button>
+                    <!-- Tombol Filter -->
+                    <button type="submit" class="btn btn-light w-100">Terapkan Filter</button>
+                </form>
             </div>
 
         </ul>
+        @endif
+
+
         <!-- End of Sidebar -->
 
         <!-- Content Wrapper -->
@@ -104,13 +131,50 @@
                         <i class="fa fa-bars"></i>
                     </button>
 
+                    @if(Route::currentRouteName() == 'landing')
+
+                    <!-- Topbar Search -->
+                    <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search" method="GET" action="{{ route('landing') }}">
+                        <div class="input-group">
+                            <input type="text" name="search" id="search" class="form-control bg-light border-0 smalll" placeholder="Masukkan nama kendaraan" value="{{ request('search') }}" aria-label="Search" aria-describedby="basic-addon2">
+                            <div class="input-group-append">
+                                <button class="btn btn-primary" type="button">
+                                    <i class="fas fa-search fa-sm"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    @endif
+
                     <!-- Topbar Navbar -->
                     <ul class="navbar-nav ml-auto">
 
+                        <li class="nav-item">
+                            <a class="nav-link font-weight-bold text-gray-700" href="{{ route('landing') }}">
+                                Home
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link font-weight-bold text-gray-700" href="#mobil">
+                                Beli Mobil
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link font-weight-bold text-gray-700" href="#motor">
+                                Beli Motor
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link font-weight-bold text-gray-700" href="{{ route('login') }}">
+                                FAQ
+                            </a>
+                        </li>
 
                         <div class="topbar-divider d-none d-sm-block"></div>
 
-                        <!-- Nav Item - User Information -->
+                        <!-- Jika User Terautentikasi -->
+                        @auth
                         <li class="nav-item dropdown no-arrow">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{ Auth::user()->name }}</span>
@@ -129,8 +193,18 @@
                                 </a>
                             </div>
                         </li>
+                        @endauth
 
+                        <!-- Jika User Belum Terautentikasi -->
+                        @guest
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('login') }}">
+                                <button class="btn btn-primary">{{ __('Login') }}</button>
+                            </a>
+                        </li>
+                        @endguest
                     </ul>
+
 
                 </nav>
                 <!-- End of Topbar -->
@@ -186,34 +260,7 @@
     <script src="{{ asset('vendor/jquery-easing/jquery.easing.min.js') }}"></script>
     <script src="{{ asset('js/sb-admin-2.min.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            setTimeout(function() {
-                var alert = document.getElementById('autoDismissAlert');
-                if (alert) {
-                    alert.style.transition = 'opacity 0.5s ease';
-                    alert.style.opacity = '0';
-                    setTimeout(function() {
-                        alert.remove();
-                    }, 500);
-                }
-            }, 5000); // 5000ms = 5 detik
-        });
 
-        document.addEventListener("DOMContentLoaded", function() {
-            setTimeout(function() {
-                var alert = document.getElementById('autoDismissError');
-                if (alert) {
-                    alert.style.transition = 'opacity 0.5s ease';
-                    alert.style.opacity = '0';
-                    setTimeout(function() {
-                        alert.remove();
-                    }, 500);
-                }
-            }, 5000); // 5000ms = 5 detik
-        });
-
-    </script>
 
 </body>
 </html>

@@ -19,9 +19,17 @@ class BrandController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $brands = Brand::all();
+        $query = Brand::query();
+
+        if ($request->has('search')) {
+            $searchTerm = $request->input('search');
+            $query->where('name', 'like', "%{$searchTerm}%");
+        }
+
+        $brands = $query->paginate(10);
+
 
         return view('admin.brand.index', compact('brands'));
     }
@@ -39,6 +47,8 @@ class BrandController extends Controller
      */
     public function store(StoreBrandRequest $request)
     {
+        $data = $request->only(['name']);
+
         if ($request->hasFile('cover')) {
             $coverPath = $request->file('cover')->store('brands_covers', 'public');
             $data['cover'] = $coverPath;
@@ -49,7 +59,6 @@ class BrandController extends Controller
 
         return redirect()->route('brands.index')->with('success', 'Brand created successfully');
     }
-
     /**
      * Display the specified resource.
      */

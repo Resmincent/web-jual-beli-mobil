@@ -11,13 +11,27 @@
                     @csrf
                     <div class="row">
                         <div class="col-lg-9">
-                            <div class="mb-4">
-                                <label for="exampleFormControlInput1" class="form-label">Judul</label>
-                                <input type="text" name="title" class="form-control @error('title') is-invalid @enderror" id="exampleFormControlInput1" placeholder="Judul Artikel" value="{{ old('title') }}" required />
-                                @error('title')
-                                <small class="invalid-feedback" role="alert">{{ $message }}</small>
-                                @enderror
+                            <div class="row">
+                                <div class="col-lg-8">
+                                    <div class="mb-4">
+                                        <label for="exampleFormControlInput1" class="form-label">Judul</label>
+                                        <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" id="exampleFormControlInput1" placeholder="Judul Artikel" value="{{ old('name') }}" required />
+                                        @error('name')
+                                        <small class="invalid-feedback" role="alert">{{ $message }}</small>
+                                        @enderror
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="mb-4">
+                                        <label for="transmisi" class="form-label">Transmisi</label>
+                                        <input type="text" name="transmition" class="form-control @error('transmition') is-invalid @enderror" id="transmisi" placeholder="Transmisi" value="{{ old('transmition') }}" required />
+                                        @error('transmition')
+                                        <small class="invalid-feedback" role="alert">{{ $message }}</small>
+                                        @enderror
+                                    </div>
+                                </div>
                             </div>
+
                             <div class="row">
                                 <div class="col-lg-2">
                                     <div class="form-group focused">
@@ -74,22 +88,20 @@
                                 <label class="form-label d-block">Kategori</label>
                                 @foreach($categories as $category)
                                 <div class="form-check mt-2">
-                                    <input name="category" class="form-check-input @error('category') is-invalid @enderror" type="radio" value="{{ $category->id }}" id="category{{ $category->id }}" {{ old('category') == $category->id ? 'checked' : '' }} required />
+                                    <input name="category_id" class="form-check-input @error('category_id') is-invalid @enderror" type="radio" value="{{ $category->id }}" id="category{{ $category->id }}" {{ old('category_id') == $category->id ? 'checked' : '' }} required />
                                     <label class="form-check-label" for="category{{ $category->id }}">{{ $category->name }}</label>
                                 </div>
                                 @endforeach
-                                @error('category')
+                                @error('category_id')
                                 <small class="invalid-feedback" role="alert">{{ $message }}</small>
                                 @enderror
                             </div>
                             <div class="mb-3">
-                                <label for="uploadHeader" class="form-label">Gambar Header*</label>
-                                <input type="file" name="image" class="form-control @error('image') is-invalid @enderror" id="uploadHeader" required />
-                                <small class="text-danger">Max Size 5Mb, ext. png, jpg, jpeg</small>
-                                @error('image')
-                                <small class="invalid-feedback" role="alert">{{ $message }}</small>
-                                @enderror
+                                <label for="image" class="form-label">Gambar Kendaraan*</label>
+                                <input type="file" name="image" class="border-hover-success form-control" id="image" required>
+                                <small class="text-danger">Max Size 2MB, ext. png, jpg, jpeg</small>
                             </div>
+                            <div id="imagePreview" class="row mt-3"></div>
                         </div>
                     </div>
 
@@ -103,18 +115,39 @@
                     <hr>
                     <div class="mb-3 float-end">
                         <a href="{{ route('vehicles.index') }}" class="btn btn-danger">Batalkan</a>
-                        <button type="submit" class="btn btn-primary">Submit</button>
+                        <button type="submit" class="btn btn-primary">Simpan</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
-    <script src="https://cdn.ckeditor.com/ckeditor5/35.4.0/classic/ckeditor.js"></script>
-    <script type="text/javascript">
-        ClassicEditor.create(document.querySelector('.editor')).then(editor => {
-            console.log(editor);
-        })
-
-    </script>
 </div>
+
+<script src="https://cdn.ckeditor.com/ckeditor5/35.4.0/classic/ckeditor.js"></script>
+<script>
+    ClassicEditor.create(document.querySelector('.editor')).catch(error => {
+        console.error(error);
+    });
+
+    document.getElementById('image').addEventListener('change', function(event) {
+        const imagePreview = document.getElementById('imagePreview');
+        imagePreview.innerHTML = '';
+
+        Array.from(event.target.files).forEach(file => {
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const div = document.createElement('div');
+                    div.className = 'col-md-4 mb-2';
+                    div.innerHTML = `
+                        <img src="${e.target.result}" class="img-thumbnail" style="height: 150px; object-fit: cover;">
+                    `;
+                    imagePreview.appendChild(div);
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+    });
+
+</script>
 @endsection

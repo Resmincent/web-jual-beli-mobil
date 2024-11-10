@@ -19,9 +19,16 @@ class CategoryController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $categories = Category::all();
+        $query = Category::query();
+
+        if ($request->has('search')) {
+            $searchTerm = $request->input('search');
+            $query->where('name', 'like', "%{$searchTerm}%");
+        }
+
+        $categories = $query->paginate(10);
 
         return view('admin.category.index', compact('categories'));
     }
@@ -43,7 +50,7 @@ class CategoryController extends Controller
         $data['slug'] = Str::slug($data['name']);
         Category::create($data);
 
-        return redirect()->route('')->with('success', 'Category created successfully');
+        return redirect()->route('categories.index')->with('success', 'Category created successfully');
     }
 
     /**

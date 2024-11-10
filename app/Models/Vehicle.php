@@ -11,15 +11,15 @@ class Vehicle extends Model
 
     protected $fillable = [
         'name',
-        'slug',
         'description',
         'price',
-        'images',
+        'image',
         'category_id',
         'brand_id',
         'year',
-        'model',
         'mileage',
+        'model',
+        'transmition'
     ];
 
     public function brands()

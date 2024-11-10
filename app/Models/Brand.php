@@ -13,8 +13,6 @@ class Brand extends Model
         'name',
         'slug',
         'cover',
-        'category_id',
-        'brand_id',
     ];
 
     public function vehicle()

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Vehicle;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -26,8 +27,14 @@ class HomeController extends Controller
     {
         $users = User::count();
 
+        $cars = Vehicle::where('category_id', 1)->count();
+        $motorscycles = Vehicle::where('category_id', 2)->count();
+
+
         $widget = [
             'users' => $users,
+            'cars' => $cars,
+            'motorscycles' => $motorscycles,
             //...
         ];
 

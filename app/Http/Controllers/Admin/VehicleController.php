@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreVehicleRequest;
 use App\Models\Brand;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use App\Models\Vehicle;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 
@@ -27,10 +27,11 @@ class VehicleController extends Controller
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
 
-        $query = Vehicle::with('brand', 'category');
+        $query = Vehicle::with('brands', 'categories');
 
         if ($search) {
-            $query->where('title', 'like', '%' . $search . '%');
+            $query->where('name', 'like', '%' . $search . '%')
+                ->orWhere('year', 'like', '%' . $search . '%');
         }
 
         if ($startDate && $endDate) {
@@ -60,22 +61,28 @@ class VehicleController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreVehicleRequest $request)
+    public function store(Request $request)
     {
-        $data = $request->all();
-        $data['slug'] = Str::slug($data['name']);
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:100',
+            'description' => 'nullable|string',
+            'year' => 'required|string|max:15',
+            'model' => 'required|string|max:20',
+            'transmition' => 'required|string|max:20',
+            'mileage' => 'required|string|max:30',
+            'price' => 'required|numeric',
+            'category_id' => 'required|exists:categories,id',
+            'brand_id' => 'required|exists:brands,id',
+            'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048'
+        ]);
 
-        $images = [];
-        if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $image) {
-                $images[] = $image->store('images', 'public');
-            }
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('vehicles', 'public');
+            $validatedData['image'] = $imagePath;
         }
-        $data['images'] = json_encode($images); // Simpan sebagai JSON
 
-        Vehicle::create($data);
-
-        return redirect()->route('admin.vehicles.index')->with('success', 'Vehicle created successfully.');
+        Vehicle::create($validatedData);
+        return redirect()->route('vehicles.index')->with('success', 'Kendaraan berhasil di tambahkan');
     }
 
 
@@ -84,7 +91,7 @@ class VehicleController extends Controller
      */
     public function show($id)
     {
-        $data = Vehicle::where('id', $id)->findOrFail($id);
+        $vehicle = Vehicle::where('id', $id)->findOrFail($id);
         return view('admin.vehicle.detail', compact('vehicle'));
     }
 
@@ -93,49 +100,68 @@ class VehicleController extends Controller
      */
     public function edit(Vehicle $vehicle)
     {
-        return view('admin.vehicle.edit', compact('vehicle'));
+        $categories = Category::all();
+        $brands = Brand::all();
+        return view('admin.vehicle.edit', compact('vehicle', 'categories', 'brands'));
     }
 
+
+    /**
+     * Update the specified resource in storage.
+     */
     /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, Vehicle $vehicle)
     {
-        $data = $request->all();
-        $data['slug'] = Str::slug($data['name']);
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:100',
+            'description' => 'nullable|string',
+            'year' => 'required|string|max:15',
+            'model' => 'required|string|max:20',
+            'transmition' => 'required|string|max:20',
+            'mileage' => 'required|string|max:30',
+            'price' => 'required|numeric',
+            'category_id' => 'required|exists:categories,id',
+            'brand_id' => 'required|exists:brands,id',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
 
-        $images = json_decode($vehicle->images, true) ?? [];
-        if ($request->hasFile('images')) {
-            foreach ($images as $image) {
-                Storage::disk('public')->delete($image);
+        if ($request->hasFile('image')) {
+            if ($vehicle->image) {
+                Storage::disk('public')->delete($vehicle->image);
             }
 
-            $images = [];
-            foreach ($request->file('images') as $image) {
-                $images[] = $image->store('images', 'public');
-            }
+            $imagePath = $request->file('image')->store('vehicles', 'public');
+            $validatedData['image'] = $imagePath;
         }
-        $data['images'] = json_encode($images);
 
-        $vehicle->update($data);
+        $vehicle->update($validatedData);
 
-        return redirect()->route('admin.vehicles.index')->with('success', 'Vehicle updated successfully.');
+        return redirect()->route('vehicles.index')->with('success', 'Kendaraan berhasil diperbarui');
     }
-
 
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(Vehicle $vehicle)
     {
-        if ($vehicle->images) {
-            Storage::disk('public')->delete($vehicle->images);
+        try {
+            DB::beginTransaction();
+
+            // Delete image if exists
+            if ($vehicle->image) {
+                Storage::disk('public')->delete($vehicle->image);
+            }
+
+            // Delete the vehicle
+            $vehicle->delete();
+
+            DB::commit();
+            return redirect()->route('vehicles.index')->with('success', 'Kendaraan berhasil dihapus');
+        } catch (\Exception $e) {
+            DB::rollback();
+            return redirect()->route('vehicles.index')->with('error', 'Gagal menghapus kendaraan');
         }
-
-
-
-        $vehicle->delete();
-
-        return redirect()->route('admin.vehicles.index')->with('success', 'Vehicle deleted successfully.');
     }
 }
