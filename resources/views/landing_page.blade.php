@@ -14,7 +14,7 @@
             <p class="section-subtitle text-center mb-4">Pilihan lengkap kendaraan untuk setiap kebutuhan Anda</p>
         </div>
         <div class="row g-4">
-            @foreach ($vehicles as $v)
+            @forelse ($vehicles as $v)
             <div class="col-lg-3 col-md-4 col-sm-6">
                 <a href="{{ route('order', $v->id) }}" class="text-decoration-none">
                     <div class="vehicle-card">
@@ -42,7 +42,9 @@
                     </div>
                 </a>
             </div>
-            @endforeach
+            @empty
+            <p class="text-center ">Tidak ada kendaraan tersedia saat ini.</p>
+            @endforelse
         </div>
     </div>
 
@@ -53,7 +55,7 @@
             <p class="section-subtitle text-center mb-4">Koleksi mobil terbaik untuk kenyamanan berkendara Anda</p>
         </div>
         <div class="row g-4">
-            @foreach ($cars as $v)
+            @forelse ($cars as $v)
             <div class="col-lg-3 col-md-4 col-sm-6">
                 <a href="{{ route('order', $v->id) }}" class="text-decoration-none">
                     <div class="vehicle-card">
@@ -77,7 +79,9 @@
                     </div>
                 </a>
             </div>
-            @endforeach
+            @empty
+            <p class="text-center">Tidak ada mobil tersedia saat ini.</p>
+            @endforelse
         </div>
     </div>
 
@@ -88,7 +92,7 @@
             <p class="section-subtitle text-center mb-4">Pilihan motor berkualitas untuk mobilitas yang lebih gesit</p>
         </div>
         <div class="row g-4">
-            @foreach ($motorcycles as $v)
+            @forelse ($motorcycles as $v)
             <div class="col-lg-3 col-md-4 col-sm-6">
                 <a href="{{ route('order', $v->id) }}" class="text-decoration-none">
                     <div class="vehicle-card">
@@ -112,10 +116,13 @@
                     </div>
                 </a>
             </div>
-            @endforeach
+            @empty
+            <p class="text-center">Tidak ada motor tersedia saat ini.</p>
+            @endforelse
         </div>
     </div>
 </div>
+
 
 <style>
     /* Hero Section */
@@ -191,7 +198,7 @@
         position: relative;
         overflow: hidden;
         margin-bottom: 2rem;
-        height: 400px
+        height: 400px;
     }
 
     .vehicle-card:hover {
@@ -235,7 +242,7 @@
         font-weight: 600;
         color: #2c3e50;
         margin-bottom: 1rem;
-        height: 70px
+        height: 70px;
     }
 
     .vehicle-specs {

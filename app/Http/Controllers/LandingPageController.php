@@ -16,6 +16,7 @@ class LandingPageController extends Controller
     {
         $query = Vehicle::query();
 
+        // Filter pencarian umum untuk vehicles
         if ($request->has('search')) {
             $searchTerm = $request->input('search');
             $query->where(function ($q) use ($searchTerm) {
@@ -32,15 +33,39 @@ class LandingPageController extends Controller
             $query->where('brand_id', $request->brand_id);
         }
 
+        // Query utama untuk menampilkan semua vehicles berdasarkan filter
         $vehicles = $query->latest()->take(10)->get();
 
-        $cars = Vehicle::where('category_id', 1)
+        // Query khusus untuk cars (kategori mobil, category_id = 1)
+        $cars = Vehicle::query()
+            ->where('category_id', 1)
+            ->when($request->has('search'), function ($q) use ($request) {
+                $searchTerm = $request->input('search');
+                $q->where(function ($q) use ($searchTerm) {
+                    $q->where('name', 'like', "%{$searchTerm}%")
+                        ->orWhere('model', 'like', "%{$searchTerm}%");
+                });
+            })
+            ->when($request->has('brand_id') && $request->brand_id, function ($q) use ($request) {
+                $q->where('brand_id', $request->brand_id);
+            })
             ->latest()
             ->take(10)
             ->get();
 
-
-        $motorcycles = Vehicle::where('category_id', 2)
+        // Query khusus untuk motorcycles (kategori motor, category_id = 2)
+        $motorcycles = Vehicle::query()
+            ->where('category_id', 2)
+            ->when($request->has('search'), function ($q) use ($request) {
+                $searchTerm = $request->input('search');
+                $q->where(function ($q) use ($searchTerm) {
+                    $q->where('name', 'like', "%{$searchTerm}%")
+                        ->orWhere('model', 'like', "%{$searchTerm}%");
+                });
+            })
+            ->when($request->has('brand_id') && $request->brand_id, function ($q) use ($request) {
+                $q->where('brand_id', $request->brand_id);
+            })
             ->latest()
             ->take(10)
             ->get();

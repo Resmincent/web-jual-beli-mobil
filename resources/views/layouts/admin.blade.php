@@ -104,6 +104,15 @@
                         <i class="fa fa-bars"></i>
                     </button>
 
+                    <ul class="navbar-nav">
+                        <!-- Home Link -->
+                        <li class="nav-item {{ request()->routeIs('landing') ? 'active' : '' }}">
+                            <a class="nav-link" href="{{ route('landing') }}">
+                                <span style="font-size:20px;" class="text-gray-700">{{ __('Home') }}</span>
+                            </a>
+                        </li>
+                    </ul>
+
                     <!-- Topbar Navbar -->
                     <ul class="navbar-nav ml-auto">
 

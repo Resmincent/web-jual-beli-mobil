@@ -29,7 +29,7 @@
                         @php
                         $specs = [
                         ['icon' => 'calendar-alt', 'label' => 'Tahun', 'value' => $vehicle->year],
-                        ['icon' => 'tachometer-alt', 'label' => 'Kilometer', 'value' => $vehicle->mileage . ' km'],
+                        ['icon' => 'tachometer-alt', 'label' => 'Kilometer', 'value' => $vehicle->mileage ],
                         ['icon' => 'cog', 'label' => 'Transmisi', 'value' => $vehicle->transmition],
                         ['icon' => $vehicle->category_id == 1 ? 'car-side' : 'motorcycle', 'label' => 'Model', 'value' => $vehicle->model],
                         ];
@@ -71,9 +71,15 @@
                     </div>
 
                     <div class="booking-actions">
+                        @if(auth()->check())
                         <a href="{{ $whatsappUrl }}" class="btn btn-primary btn-lg btn-block">
                             <i class="fab fa-whatsapp"></i> Pesan Sekarang
                         </a>
+                        @else
+                        <a href="{{ route('login') }}" class="btn btn-primary btn-lg btn-block">
+                            <i class="fab fa-whatsapp"></i> Pesan Sekarang
+                        </a>
+                        @endif
                     </div>
                 </div>
             </aside>

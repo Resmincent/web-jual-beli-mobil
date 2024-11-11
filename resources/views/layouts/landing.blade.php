@@ -21,6 +21,7 @@
     <link href="{{ asset('css/sb-admin-2.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/detail-kendaraan.css') }}" rel="stylesheet">
 
+
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
     <!-- DataTables CSS for responsive design -->
@@ -165,11 +166,13 @@
                                 Beli Motor
                             </a>
                         </li>
+                        @if(auth()->check() && auth()->user()->is_admin)
                         <li class="nav-item">
-                            <a class="nav-link font-weight-bold text-gray-700" href="{{ route('login') }}">
-                                FAQ
+                            <a class="nav-link font-weight-bold text-gray-700" href="{{ route('home') }}">
+                                Dashboard Admin
                             </a>
                         </li>
+                        @endif
 
                         <div class="topbar-divider d-none d-sm-block"></div>
 
@@ -182,10 +185,6 @@
                             </a>
                             <!-- Dropdown - User Information -->
                             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
-                                <a class="dropdown-item" href="{{ route('profile') }}">
-                                    <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    {{ __('Profile') }}
-                                </a>
                                 <div class="dropdown-divider"></div>
                                 <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
                                     <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
