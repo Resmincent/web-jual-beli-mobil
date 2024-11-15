@@ -22,6 +22,10 @@ class Vehicle extends Model
         'transmition'
     ];
 
+    protected $casts = [
+        'image' => 'array'
+    ];
+
     public function brands()
     {
         return $this->belongsTo(Brand::class, 'brand_id', 'id');
@@ -30,5 +34,10 @@ class Vehicle extends Model
     public function categories()
     {
         return $this->belongsTo(Category::class, 'category_id', 'id');
+    }
+
+    public function getAllImages()
+    {
+        return $this->image ?? [];
     }
 }

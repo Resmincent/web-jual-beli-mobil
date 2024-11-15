@@ -12,59 +12,200 @@
 <div class="row">
     <!-- Vehicle Details -->
     <div class="col-lg-8 mb-4">
-        <div class="card shadow-lg border-0 rounded-lg" style="transition: transform 0.3s ease, box-shadow 0.3s ease;">
-            <div class="card-header bg-primary text-white text-center" style="border-top-left-radius: 0.5rem; border-top-right-radius: 0.5rem;">
-                <h4>{{ $vehicle->name }}</h4>
+        <div class="card shadow-lg border-0 rounded-lg">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0 text-center">{{ $vehicle->name }}</h4>
             </div>
             <div class="card-body">
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item" style="font-size: 16px; font-weight: 500;">
-                        <i class="fas fa-industry text-primary"></i> <strong>Brand:</strong> {{ $vehicle->brands->name }}
-                    </li>
-                    <li class="list-group-item" style="font-size: 16px; font-weight: 500;">
-                        <i class="fas fa-car text-primary"></i> <strong>Model:</strong> {{ $vehicle->model }}
-                    </li>
-                    <li class="list-group-item" style="font-size: 16px; font-weight: 500;">
-                        <i class="fas fa-calendar-alt text-primary"></i> <strong>Tahun:</strong> {{ $vehicle->year }}
-                    </li>
-                    <li class="list-group-item" style="font-size: 16px; font-weight: 500;">
-                        <i class="fas fa-tags text-primary"></i> <strong>Kategori:</strong> {{ $vehicle->categories->name }}
-                    </li>
-                    <li class="list-group-item" style="font-size: 16px; font-weight: 500;">
-                        <i class="fas fa-money-bill-wave text-primary"></i> <strong>Harga:</strong> {{ formatRupiah($vehicle->price) }}
-                    </li>
-                    <li class="list-group-item" style="font-size: 16px; font-weight: 500;">
-                        <i class="fas fa-clock text-primary"></i> <strong>Tanggal Dibuat:</strong> {{ $vehicle->created_at->format('d M Y') }}
-                    </li>
-                </ul>
+                <div class="row mb-4">
+                    <!-- Image Carousel -->
+                    <div class="col-12">
+                        @if($vehicle->image && count($vehicle->getAllImages()) > 0)
+                        <div id="vehicleImageCarousel" class="carousel slide" data-bs-ride="carousel">
+                            <div class="carousel-indicators">
+                                @foreach($vehicle->getAllImages() as $index => $image)
+                                <button type="button" data-bs-target="#vehicleImageCarousel" data-bs-slide-to="{{ $index }}" class="{{ $index === 0 ? 'active' : '' }}" aria-current="{{ $index === 0 ? 'true' : 'false' }}" aria-label="Slide {{ $index + 1 }}"></button>
+                                @endforeach
+                            </div>
+                            <div class="carousel-inner rounded">
+                                @foreach($vehicle->getAllImages() as $index => $image)
+                                <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
+                                    <img src="{{ asset('storage/' . $image) }}" class="d-block w-100" alt="Vehicle Image {{ $index + 1 }}" style="height: 400px; object-fit: cover;">
+                                </div>
+                                @endforeach
+                            </div>
+                            @if(count($vehicle->getAllImages()) > 1)
+                            <button class="carousel-control-prev" type="button" data-bs-target="#vehicleImageCarousel" data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Previous</span>
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#vehicleImageCarousel" data-bs-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Next</span>
+                            </button>
+                            @endif
+                        </div>
+                        <!-- Thumbnail Navigation -->
+                        <div class="d-flex mt-2 overflow-auto">
+                            @foreach($vehicle->getAllImages() as $index => $image)
+                            <div class="me-2" style="min-width: 100px;">
+                                <img src="{{ asset('storage/' . $image) }}" class="img-thumbnail cursor-pointer" onclick="$('#vehicleImageCarousel').carousel({{ $index }})" alt="Thumbnail {{ $index + 1 }}" style="height: 60px; width: 100px; object-fit: cover;">
+                            </div>
+                            @endforeach
+                        </div>
+                        @else
+                        <div class="alert alert-warning text-center mb-0" role="alert">
+                            <i class="fas fa-image me-2"></i> Gambar kendaraan belum tersedia.
+                        </div>
+                        @endif
+                    </div>
+                </div>
+
+                <!-- Vehicle Information -->
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <div class="info-group mb-3">
+                            <label class="text-primary fw-bold mb-1">
+                                <i class="fas fa-industry"></i> Brand
+                            </label>
+                            <p class="mb-0">{{ $vehicle->brands->name }}</p>
+                        </div>
+                        <div class="info-group mb-3">
+                            <label class="text-primary fw-bold mb-1">
+                                <i class="fas fa-car"></i> Model
+                            </label>
+                            <p class="mb-0">{{ $vehicle->model }}</p>
+                        </div>
+                        <div class="info-group mb-3">
+                            <label class="text-primary fw-bold mb-1">
+                                <i class="fas fa-calendar-alt"></i> Tahun
+                            </label>
+                            <p class="mb-0">{{ $vehicle->year }}</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="info-group mb-3">
+                            <label class="text-primary fw-bold mb-1">
+                                <i class="fas fa-tags"></i> Kategori
+                            </label>
+                            <p class="mb-0">{{ $vehicle->categories->name }}</p>
+                        </div>
+                        <div class="info-group mb-3">
+                            <label class="text-primary fw-bold mb-1">
+                                <i class="fas fa-money-bill-wave"></i> Harga
+                            </label>
+                            <p class="mb-0">{{ formatRupiah($vehicle->price) }}</p>
+                        </div>
+                        <div class="info-group mb-3">
+                            <label class="text-primary fw-bold mb-1">
+                                <i class="fas fa-clock"></i> Tanggal Dibuat
+                            </label>
+                            <p class="mb-0">{{ $vehicle->created_at->format('d M Y') }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                @if($vehicle->description)
+                <div class="mt-4">
+                    <label class="text-primary fw-bold mb-2">
+                        <i class="fas fa-align-left"></i> Deskripsi
+                    </label>
+                    <div class="p-3 bg-light rounded">
+                        {!! $vehicle->description !!}
+                    </div>
+                </div>
+                @endif
             </div>
-            <div class="card-footer text-center">
-                <a href="{{ route('vehicles.edit', $vehicle->id) }}" class="btn btn-outline-warning btn-sm mx-1" style="color: #ffc107; transition: color 0.3s ease, background-color 0.3s ease;" onmouseover="this.style.color='white'; this.style.backgroundColor='#ffc107';" onmouseout="this.style.color='#ffc107'; this.style.backgroundColor='';">
-                    <i class="fas fa-edit"></i> Edit
-                </a>
-                <form action="{{ route('vehicles.destroy', $vehicle->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus kendaraan ini?');">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="btn btn-outline-danger btn-sm mx-1" style="color: #dc3545; transition: color 0.3s ease, background-color 0.3s ease;" onmouseover="this.style.color='white'; this.style.backgroundColor='#dc3545';" onmouseout="this.style.color='#dc3545'; this.style.backgroundColor='';">
-                        <i class="fas fa-trash"></i> Hapus
-                    </button>
-                </form>
+            <div class="card-footer">
+                <div class="d-flex justify-content-center gap-2">
+                    <a href="{{ route('vehicles.edit', $vehicle->id) }}" class="btn btn-warning">
+                        <i class="fas fa-edit me-1"></i> Edit
+                    </a>
+                    <form action="{{ route('vehicles.destroy', $vehicle->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus kendaraan ini?');">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash me-1"></i> Hapus
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Vehicle Image -->
-    <div class="col-lg-4 mb-4">
-        @if($vehicle->image)
-        <div class="card shadow-lg border-0 rounded-lg" style="transition: transform 0.3s ease, box-shadow 0.3s ease;">
-            <img src="{{ Storage::url($vehicle->image) }}" class="img-fluid rounded-top" alt="{{ $vehicle->name }}" style="max-height: 350px; object-fit: cover; width: 100%; object-position: center;">
-            <div class="card-footer text-center text-muted">Gambar Kendaraan</div>
+    <!-- Additional Information -->
+    <div class="col-lg-4">
+        <div class="card shadow-lg border-0 rounded-lg">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Informasi Tambahan</h5>
+            </div>
+            <div class="card-body">
+                <div class="info-group mb-3">
+                    <label class="text-primary fw-bold mb-1">
+                        <i class="fas fa-tachometer-alt"></i> Jarak Tempuh
+                    </label>
+                    <p class="mb-0">{{ $vehicle->mileage }}</p>
+                </div>
+                <div class="info-group mb-3">
+                    <label class="text-primary fw-bold mb-1">
+                        <i class="fas fa-cog"></i> Transmisi
+                    </label>
+                    <p class="mb-0">{{ $vehicle->transmition }}</p>
+                </div>
+                <div class="info-group">
+                    <label class="text-primary fw-bold mb-1">
+                        <i class="fas fa-clock"></i> Terakhir Diupdate
+                    </label>
+                    <p class="mb-0">{{ $vehicle->updated_at->format('d M Y H:i') }}</p>
+                </div>
+            </div>
         </div>
-        @else
-        <div class="alert alert-warning text-center" role="alert" style="font-size: 16px;">
-            Gambar kendaraan belum tersedia.
-        </div>
-        @endif
     </div>
 </div>
+
+<style>
+    .cursor-pointer {
+        cursor: pointer;
+    }
+
+    .info-group label {
+        font-size: 0.9rem;
+    }
+
+    .info-group p {
+        font-size: 1rem;
+    }
+
+    .carousel-item img {
+        transition: transform .5s ease-in-out;
+    }
+
+    .carousel-control-prev,
+    .carousel-control-next {
+        width: 5%;
+        background: rgba(0, 0, 0, 0.2);
+    }
+
+    .carousel-indicators {
+        margin-bottom: 0.5rem;
+    }
+
+</style>
+
+<script>
+    $(document).ready(function() {
+        // Initialize Bootstrap carousel
+        var carousel = new bootstrap.Carousel(document.getElementById('vehicleImageCarousel'), {
+            interval: 5000
+            , wrap: true
+        });
+
+        // Prevent image drag
+        $('img').on('dragstart', function(event) {
+            event.preventDefault();
+        });
+    });
+
+</script>
+
 @endsection

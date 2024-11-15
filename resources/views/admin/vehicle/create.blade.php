@@ -98,7 +98,7 @@
                             </div>
                             <div class="mb-3">
                                 <label for="image" class="form-label">Gambar Kendaraan*</label>
-                                <input type="file" name="image" class="border-hover-success form-control" id="image" required>
+                                <input type="file" name="image[]" class="border-hover-success form-control" id="image" multiple required>
                                 <small class="text-danger">Max Size 2MB, ext. png, jpg, jpeg</small>
                             </div>
                             <div id="imagePreview" class="row mt-3"></div>

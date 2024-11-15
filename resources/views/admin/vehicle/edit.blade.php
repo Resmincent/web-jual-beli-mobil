@@ -112,7 +112,7 @@
                                     <img src="{{ Storage::url($vehicle->image) }}" alt="Current Image" class="img-thumbnail" style="max-height: 150px;">
                                 </div>
                                 @endif
-                                <input type="file" name="image" class="form-control" id="uploadHeader" />
+                                <input type="file" name="image[]" class="form-control" id="uploadHeader" />
                                 <small class="text-danger">Max Size 5Mb, ext. png, jpg, jpeg</small>
                                 <small class="d-block">Kosongkan jika tidak ingin mengubah gambar</small>
                             </div>

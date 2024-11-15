@@ -73,18 +73,37 @@ class VehicleController extends Controller
             'price' => 'required|numeric',
             'category_id' => 'required|exists:categories,id',
             'brand_id' => 'required|exists:brands,id',
-            'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048'
+            'image' => 'required|array',
+            'image.*' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('vehicles', 'public');
-            $validatedData['image'] = $imagePath;
+        try {
+            DB::beginTransaction();
+
+            unset($validatedData['image']);
+
+            $vehicle = Vehicle::create($validatedData);
+
+            $imagePaths = [];
+            if ($request->hasFile('image')) {
+                foreach ($request->file('image') as $file) {
+                    $path = $file->store('vehicles', 'public');
+                    $imagePaths[] = $path;
+                }
+            }
+
+            $vehicle->update(['image' => $imagePaths]);
+
+            DB::commit();
+            return redirect()->route('vehicles.index')
+                ->with('success', 'Kendaraan berhasil ditambahkan dengan beberapa gambar.');
+        } catch (\Exception $e) {
+            DB::rollback();
+            return redirect()->back()
+                ->with('error', 'Gagal menambahkan kendaraan: ' . $e->getMessage())
+                ->withInput();
         }
-
-        Vehicle::create($validatedData);
-        return redirect()->route('vehicles.index')->with('success', 'Kendaraan berhasil di tambahkan');
     }
-
 
     /**
      * Display the specified resource.
@@ -106,12 +125,6 @@ class VehicleController extends Controller
     }
 
 
-    /**
-     * Update the specified resource in storage.
-     */
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Vehicle $vehicle)
     {
         $validatedData = $request->validate([
@@ -124,22 +137,44 @@ class VehicleController extends Controller
             'price' => 'required|numeric',
             'category_id' => 'required|exists:categories,id',
             'brand_id' => 'required|exists:brands,id',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'nullable|array',
+            'image.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        if ($request->hasFile('image')) {
-            if ($vehicle->image) {
-                Storage::disk('public')->delete($vehicle->image);
+        try {
+            DB::beginTransaction();
+
+            unset($validatedData['image']);
+
+            $vehicle->update($validatedData);
+
+            if ($request->hasFile('image')) {
+                if (!empty($vehicle->image)) {
+                    foreach ($vehicle->image as $imagePath) {
+                        Storage::disk('public')->delete($imagePath);
+                    }
+                }
+
+                $imagePaths = [];
+                foreach ($request->file('image') as $file) {
+                    $path = $file->store('vehicles', 'public');
+                    $imagePaths[] = $path;
+                }
+
+                $vehicle->update(['image' => $imagePaths]);
             }
 
-            $imagePath = $request->file('image')->store('vehicles', 'public');
-            $validatedData['image'] = $imagePath;
+            DB::commit();
+            return redirect()->route('vehicles.index')
+                ->with('success', 'Kendaraan berhasil diperbarui');
+        } catch (\Exception $e) {
+            DB::rollback();
+            return redirect()->back()
+                ->with('error', 'Gagal memperbarui kendaraan: ' . $e->getMessage())
+                ->withInput();
         }
-
-        $vehicle->update($validatedData);
-
-        return redirect()->route('vehicles.index')->with('success', 'Kendaraan berhasil diperbarui');
     }
+
 
     /**
      * Remove the specified resource from storage.
@@ -149,19 +184,21 @@ class VehicleController extends Controller
         try {
             DB::beginTransaction();
 
-            // Delete image if exists
-            if ($vehicle->image) {
-                Storage::disk('public')->delete($vehicle->image);
+            if (!empty($vehicle->image)) {
+                foreach ($vehicle->image as $imagePath) {
+                    Storage::disk('public')->delete($imagePath);
+                }
             }
 
-            // Delete the vehicle
             $vehicle->delete();
 
             DB::commit();
-            return redirect()->route('vehicles.index')->with('success', 'Kendaraan berhasil dihapus');
+            return redirect()->route('vehicles.index')
+                ->with('success', 'Kendaraan berhasil dihapus');
         } catch (\Exception $e) {
             DB::rollback();
-            return redirect()->route('vehicles.index')->with('error', 'Gagal menghapus kendaraan');
+            return redirect()->route('vehicles.index')
+                ->with('error', 'Gagal menghapus kendaraan: ' . $e->getMessage());
         }
     }
 }
