@@ -15,6 +15,27 @@
     position: relative;
 }
 
+.vehicle-gallery .image-thumbnails {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+    margin: 0.3rem;
+}
+
+.vehicle-gallery .thumbnail-image {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    cursor: pointer;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    transition: border-color 0.3s;
+}
+
+.vehicle-gallery .thumbnail-image:hover {
+    border-color: #007bff;
+}
+
 .main-image-container {
     position: relative;
     height: 450px;

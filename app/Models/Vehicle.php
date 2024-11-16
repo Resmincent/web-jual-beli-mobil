@@ -13,13 +13,13 @@ class Vehicle extends Model
         'name',
         'description',
         'price',
-        'image',
         'category_id',
         'brand_id',
         'year',
         'mileage',
         'model',
-        'transmition'
+        'transmition',
+        'thumbnail'
     ];
 
     public function brands()
@@ -30,5 +30,15 @@ class Vehicle extends Model
     public function categories()
     {
         return $this->belongsTo(Category::class, 'category_id', 'id');
+    }
+
+    public function images()
+    {
+        return $this->hasMany(VehicleImage::class);
+    }
+
+    public function sales()
+    {
+        return $this->hasMany(Sale::class);
     }
 }

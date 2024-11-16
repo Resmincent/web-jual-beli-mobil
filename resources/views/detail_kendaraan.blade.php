@@ -8,11 +8,16 @@
             <!-- Image Gallery -->
             <section class="vehicle-gallery card mb-4">
                 <div class="main-image-container">
-                    <img src="{{ Storage::url($vehicle->image) }}" alt="{{ $vehicle->name }}" class="main-image" id="mainImage">
+                    <img src="{{ Storage::url($vehicle->thumbnail) }}" alt="{{ $vehicle->name }}" class="main-image" id="mainImage">
                     <div class="category-badge">
                         <i class="fas fa-{{ $vehicle->categories->name == 'Motor' ? 'motorcycle' : 'car' }}"></i>
                         {{ $vehicle->categories->name }}
                     </div>
+                </div>
+                <div class="image-thumbnails">
+                    @foreach ($vehicle->images as $image)
+                    <img src="{{ Storage::url($image->image) }}" alt="{{ $vehicle->name }}" class="thumbnail-image" onclick="changeMainImage('{{ Storage::url($image->image) }}')">
+                    @endforeach
                 </div>
             </section>
 
@@ -85,6 +90,14 @@
             </aside>
         </div>
     </div>
+
+    <script>
+        function changeMainImage(imageUrl) {
+            document.getElementById('mainImage').src = imageUrl;
+        }
+
+    </script>
+
 </div>
 
 

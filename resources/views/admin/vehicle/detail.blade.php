@@ -55,9 +55,9 @@
 
     <!-- Vehicle Image -->
     <div class="col-lg-4 mb-4">
-        @if($vehicle->image)
+        @if($vehicle->thumbnail)
         <div class="card shadow-lg border-0 rounded-lg" style="transition: transform 0.3s ease, box-shadow 0.3s ease;">
-            <img src="{{ Storage::url($vehicle->image) }}" class="img-fluid rounded-top" alt="{{ $vehicle->name }}" style="max-height: 350px; object-fit: cover; width: 100%; object-position: center;">
+            <img src="{{ Storage::url($vehicle->thumbnail) }}" class="img-fluid rounded-top" alt="{{ $vehicle->name }}" style="max-height: 350px; object-fit: cover; width: 100%; object-position: center;">
             <div class="card-footer text-center text-muted">Gambar Kendaraan</div>
         </div>
         @else

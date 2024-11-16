@@ -97,11 +97,19 @@
                                 @enderror
                             </div>
                             <div class="mb-3">
-                                <label for="image" class="form-label">Gambar Kendaraan*</label>
-                                <input type="file" name="image" class="border-hover-success form-control" id="image" required>
+                                <label for="thumbnail" class="form-label">Thumbnail Kendaraan*</label>
+                                <input type="file" name="thumbnail" class="border-hover-success form-control" id="thumbnail" required>
                                 <small class="text-danger">Max Size 2MB, ext. png, jpg, jpeg</small>
                             </div>
+                            <div id="thumbnailPreview" class="row mt-3"></div>
+
+                            <div class="mb-3">
+                                <label for="vehicle_images" class="form-label">Gambar Kendaraan (Multiple)*</label>
+                                <input type="file" name="vehicle_images[]" class="border-hover-success form-control" id="vehicle_images" multiple required>
+                                <small class="text-danger">Max Size 2MB per file, ext. png, jpg, jpeg</small>
+                            </div>
                             <div id="imagePreview" class="row mt-3"></div>
+
                         </div>
                     </div>
 
@@ -129,7 +137,27 @@
         console.error(error);
     });
 
-    document.getElementById('image').addEventListener('change', function(event) {
+    // Thumbnail preview
+    document.getElementById('thumbnail').addEventListener('change', function(event) {
+        const thumbnailPreview = document.getElementById('thumbnailPreview');
+        thumbnailPreview.innerHTML = '';
+
+        if (event.target.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const div = document.createElement('div');
+                div.className = 'col-md-12 mb-2';
+                div.innerHTML = `
+                    <img src="${e.target.result}" class="img-thumbnail" style="height: 200px; object-fit: cover;">
+                `;
+                thumbnailPreview.appendChild(div);
+            }
+            reader.readAsDataURL(event.target.files[0]);
+        }
+    });
+
+    // Multiple images preview
+    document.getElementById('vehicle_images').addEventListener('change', function(event) {
         const imagePreview = document.getElementById('imagePreview');
         imagePreview.innerHTML = '';
 
@@ -138,9 +166,12 @@
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     const div = document.createElement('div');
-                    div.className = 'col-md-4 mb-2';
+                    div.className = 'col-md-6 mb-2';
                     div.innerHTML = `
-                        <img src="${e.target.result}" class="img-thumbnail" style="height: 150px; object-fit: cover;">
+                        <div class="position-relative">
+                            <img src="${e.target.result}" class="img-thumbnail" style="height: 150px; width: 100%; object-fit: cover;">
+                            <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 m-1" onclick="this.parentElement.parentElement.remove()">×</button>
+                        </div>
                     `;
                     imagePreview.appendChild(div);
                 }

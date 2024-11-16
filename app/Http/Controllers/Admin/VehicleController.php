@@ -8,7 +8,6 @@ use App\Models\Category;
 use Illuminate\Http\Request;
 use App\Models\Vehicle;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 
 class VehicleController extends Controller
@@ -73,18 +72,43 @@ class VehicleController extends Controller
             'price' => 'required|numeric',
             'category_id' => 'required|exists:categories,id',
             'brand_id' => 'required|exists:brands,id',
-            'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048'
+            'thumbnail' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'vehicle_images' => 'required|array|min:1',
+            'vehicle_images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('vehicles', 'public');
-            $validatedData['image'] = $imagePath;
+
+        try {
+            DB::beginTransaction();
+
+            if ($request->hasFile('thumbnail')) {
+                $thumbnailPath = $request->file('thumbnail')->store('vehicles/thumbnails', 'public');
+                $validatedData['thumbnail'] = $thumbnailPath;
+            }
+
+            $vehicle = Vehicle::create($validatedData);
+
+            if ($request->hasFile('vehicle_images')) {
+                foreach ($request->file('vehicle_images') as $image) {
+                    $imagePath = $image->store('vehicles/images', 'public');
+                    $vehicle->images()->create(['image' => $imagePath]);
+                }
+            }
+
+            DB::commit();
+            return redirect()->route('vehicles.index')->with('success', 'Kendaraan berhasil ditambahkan');
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            if (isset($thumbnailPath) && Storage::disk('public')->exists($thumbnailPath)) {
+                Storage::disk('public')->delete($thumbnailPath);
+            }
+
+            return redirect()->back()
+                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage())
+                ->withInput();
         }
-
-        Vehicle::create($validatedData);
-        return redirect()->route('vehicles.index')->with('success', 'Kendaraan berhasil di tambahkan');
     }
-
 
     /**
      * Display the specified resource.
@@ -105,14 +129,10 @@ class VehicleController extends Controller
         return view('admin.vehicle.edit', compact('vehicle', 'categories', 'brands'));
     }
 
-
     /**
      * Update the specified resource in storage.
      */
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Vehicle $vehicle)
+    public function update(Request $request, $id)
     {
         $validatedData = $request->validate([
             'name' => 'required|string|max:100',
@@ -124,44 +144,94 @@ class VehicleController extends Controller
             'price' => 'required|numeric',
             'category_id' => 'required|exists:categories,id',
             'brand_id' => 'required|exists:brands,id',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'vehicle_images' => 'nullable|array',
+            'vehicle_images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'delete_images' => 'nullable|array',
+            'delete_images.*' => 'exists:vehicle_images,id'
         ]);
 
-        if ($request->hasFile('image')) {
-            if ($vehicle->image) {
-                Storage::disk('public')->delete($vehicle->image);
+        try {
+            DB::beginTransaction();
+
+            $vehicle = Vehicle::findOrFail($id);
+
+            if ($request->hasFile('thumbnail')) {
+                if ($vehicle->thumbnail && Storage::disk('public')->exists($vehicle->thumbnail)) {
+                    Storage::disk('public')->delete($vehicle->thumbnail);
+                }
+
+                $thumbnailPath = $request->file('thumbnail')->store('vehicles/thumbnails', 'public');
+                $validatedData['thumbnail'] = $thumbnailPath;
             }
 
-            $imagePath = $request->file('image')->store('vehicles', 'public');
-            $validatedData['image'] = $imagePath;
+            $vehicle->update($validatedData);
+
+            if ($request->has('delete_images')) {
+                foreach ($request->delete_images as $imageId) {
+                    $image = $vehicle->images()->find($imageId);
+                    if ($image) {
+                        if (Storage::disk('public')->exists($image->image)) {
+                            Storage::disk('public')->delete($image->image);
+                        }
+                        $image->delete();
+                    }
+                }
+            }
+
+            if ($request->hasFile('vehicle_images')) {
+                foreach ($request->file('vehicle_images') as $image) {
+                    $imagePath = $image->store('vehicles/images', 'public');
+                    $vehicle->images()->create(['image' => $imagePath]);
+                }
+            }
+
+            DB::commit();
+            return redirect()->route('vehicles.index')
+                ->with('success', 'Kendaraan berhasil diperbarui');
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            if (isset($thumbnailPath) && Storage::disk('public')->exists($thumbnailPath)) {
+                Storage::disk('public')->delete($thumbnailPath);
+            }
+
+            return redirect()->back()
+                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage())
+                ->withInput();
         }
-
-        $vehicle->update($validatedData);
-
-        return redirect()->route('vehicles.index')->with('success', 'Kendaraan berhasil diperbarui');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Vehicle $vehicle)
+    public function destroy($id)
     {
         try {
             DB::beginTransaction();
 
-            // Delete image if exists
-            if ($vehicle->image) {
-                Storage::disk('public')->delete($vehicle->image);
+            $vehicle = Vehicle::findOrFail($id);
+
+            if ($vehicle->thumbnail && Storage::disk('public')->exists($vehicle->thumbnail)) {
+                Storage::disk('public')->delete($vehicle->thumbnail);
             }
 
-            // Delete the vehicle
+            foreach ($vehicle->images as $image) {
+                if (Storage::disk('public')->exists($image->image)) {
+                    Storage::disk('public')->delete($image->image);
+                }
+                $image->delete();
+            }
+
             $vehicle->delete();
 
             DB::commit();
-            return redirect()->route('vehicles.index')->with('success', 'Kendaraan berhasil dihapus');
+            return redirect()->route('vehicles.index')
+                ->with('success', 'Kendaraan berhasil dihapus');
         } catch (\Exception $e) {
-            DB::rollback();
-            return redirect()->route('vehicles.index')->with('error', 'Gagal menghapus kendaraan');
+            DB::rollBack();
+            return redirect()->back()
+                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
 }

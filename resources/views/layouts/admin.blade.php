@@ -45,6 +45,13 @@
             <hr class="sidebar-divider my-0">
 
             <!-- Nav Item - Kendaraan -->
+
+            <li class="nav-item {{ Nav::isRoute('sales.index') }}">
+                <a class="nav-link" href="{{ route('sales.index') }}">
+                    <i class="fas fa-fw fa-book"></i>
+                    <span>{{ __('Data Penjualan') }}</span></a>
+            </li>
+
             <li class="nav-item {{ Nav::isRoute('vehicles.index') }}">
                 <a class="nav-link" href="{{ route('vehicles.index') }}">
                     <i class="fas fa-fw fa-tachometer-alt"></i>

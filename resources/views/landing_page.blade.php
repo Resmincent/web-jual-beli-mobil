@@ -26,7 +26,7 @@
                             @endif
                         </div>
                         <div class="card-img-wrapper">
-                            <img src="{{ Storage::url($v->image) }}" alt="{{ $v->name }}">
+                            <img src="{{ Storage::url($v->thumbnail) }}" alt="{{ $v->name }}">
                         </div>
                         <div class="card-content">
                             <h3 class="vehicle-name">{{ $v->name }}</h3>
@@ -63,7 +63,7 @@
                             <span class="badge bg-primary"><i class="fas fa-car"></i> Mobil</span>
                         </div>
                         <div class="card-img-wrapper">
-                            <img src="{{ Storage::url($v->image) }}" alt="{{ $v->name }}">
+                            <img src="{{ Storage::url($v->thumbnail) }}" alt="{{ $v->name }}">
                         </div>
                         <div class="card-content">
                             <h3 class="vehicle-name">{{ $v->name }}</h3>
@@ -100,7 +100,7 @@
                             <span class="badge bg-info"><i class="fas fa-motorcycle"></i> Motor</span>
                         </div>
                         <div class="card-img-wrapper">
-                            <img src="{{ Storage::url($v->image) }}" alt="{{ $v->name }}">
+                            <img src="{{ Storage::url($v->thumbnail) }}" alt="{{ $v->name }}">
                         </div>
                         <div class="card-content">
                             <h3 class="vehicle-name">{{ $v->name }}</h3>

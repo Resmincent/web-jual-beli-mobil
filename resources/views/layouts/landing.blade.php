@@ -158,12 +158,12 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link font-weight-bold text-gray-700" href="#mobil">
-                                Beli Mobil
+                                Mobil
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link font-weight-bold text-gray-700" href="#motor">
-                                Beli Motor
+                                Motor
                             </a>
                         </li>
                         @if(auth()->check() && auth()->user()->is_admin)
