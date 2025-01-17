@@ -8,6 +8,8 @@ use App\Models\Brand;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use App\Models\Category;
+
 
 
 class BrandController extends Controller
@@ -19,6 +21,7 @@ class BrandController extends Controller
     /**
      * Display a listing of the resource.
      */
+
     public function index(Request $request)
     {
         $query = Brand::query();
@@ -30,9 +33,12 @@ class BrandController extends Controller
 
         $brands = $query->paginate(10);
 
+        // Ambil semua kategori dari tabel categories
+        $categories = Category::all();
 
-        return view('admin.brand.index', compact('brands'));
+        return view('admin.brand.index', compact('brands', 'categories'));
     }
+
 
     /**
      * Show the form for creating a new resource.
@@ -47,7 +53,7 @@ class BrandController extends Controller
      */
     public function store(StoreBrandRequest $request)
     {
-        $data = $request->only(['name']);
+        $data = $request->only(['name', 'category_id']);
 
         if ($request->hasFile('cover')) {
             $coverPath = $request->file('cover')->store('brands_covers', 'public');
@@ -59,6 +65,7 @@ class BrandController extends Controller
 
         return redirect()->route('brands.index')->with('success', 'Brand created successfully');
     }
+
     /**
      * Display the specified resource.
      */
@@ -83,6 +90,8 @@ class BrandController extends Controller
         $data = $request->validate([
             'name' => 'required',
             'cover' => 'image|mimes:jpeg,png,jpg,svg,gif|max:2048',
+            'category_id' => 'required|exists:categories,id',
+
         ]);
 
         $brand = Brand::findOrFail($id);

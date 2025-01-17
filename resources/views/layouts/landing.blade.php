@@ -77,14 +77,14 @@
             <hr class="sidebar-divider my-0">
 
             <!-- Filter Form -->
+            <!-- Filter Form -->
             <div class="px-3 py-4">
                 <h4 class="text-white">Filter Pencarian</h4>
                 <form method="GET" action="{{ route('landing') }}">
-
                     <!-- Filter Berdasarkan Kategori -->
                     <div class="form-group mb-3">
                         <label for="category" class="text-white">Pilih Kategori:</label>
-                        <select name="category_id" id="category" class="form-control">
+                        <select name="category_id" id="category" class="form-control" onchange="this.form.submit()">
                             <option value="">Semua Kategori</option>
                             @foreach ($categories as $category)
                             <option value="{{ $category->id }}" {{ request('category_id') == $category->id ? 'selected' : '' }}>
@@ -152,17 +152,17 @@
                     <ul class="navbar-nav ml-auto">
 
                         <li class="nav-item">
-                            <a class="nav-link font-weight-bold text-gray-700" href="{{ route('landing') }}">
+                            <a class="nav-link font-weight-bold text-gray-700" href="{{ route('landing') }}" id="nav-home">
                                 Home
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link font-weight-bold text-gray-700" href="#mobil">
+                            <a class="nav-link font-weight-bold text-gray-700" href="#mobil" id="nav-mobil">
                                 Mobil
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link font-weight-bold text-gray-700" href="#motor">
+                            <a class="nav-link font-weight-bold text-gray-700" href="#motor" id="nav-motor">
                                 Motor
                             </a>
                         </li>
@@ -252,6 +252,24 @@
             </div>
         </div>
     </div>
+
+    <script>
+        document.getElementById('nav-home').addEventListener('click', function(event) {
+            event.preventDefault();
+            window.location.href = "{{ route('landing') }}";
+        });
+
+        document.getElementById('nav-mobil').addEventListener('click', function(event) {
+            event.preventDefault();
+            window.location.href = "{{ route('landing') }}#mobil";
+        });
+
+        document.getElementById('nav-motor').addEventListener('click', function(event) {
+            event.preventDefault();
+            window.location.href = "{{ route('landing') }}#motor";
+        });
+
+    </script>
 
     <!-- Scripts -->
     <script src="{{ asset('vendor/jquery/jquery.min.js') }}"></script>

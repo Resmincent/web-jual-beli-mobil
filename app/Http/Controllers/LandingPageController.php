@@ -33,10 +33,10 @@ class LandingPageController extends Controller
             $query->where('brand_id', $request->brand_id);
         }
 
-        // Query utama untuk menampilkan semua vehicles berdasarkan filter
-        $vehicles = $query->latest()->take(10)->get();
+        // Query utama untuk vehicles
+        $vehicles = $query->get();
 
-        // Query khusus untuk cars (kategori mobil, category_id = 1)
+        // Query untuk mobil (kategori 1)
         $cars = Vehicle::query()
             ->where('category_id', 1)
             ->when($request->has('search'), function ($q) use ($request) {
@@ -48,12 +48,9 @@ class LandingPageController extends Controller
             })
             ->when($request->has('brand_id') && $request->brand_id, function ($q) use ($request) {
                 $q->where('brand_id', $request->brand_id);
-            })
-            ->latest()
-            ->take(10)
-            ->get();
+            })->get();
 
-        // Query khusus untuk motorcycles (kategori motor, category_id = 2)
+        // Query untuk motor (kategori 2)
         $motorcycles = Vehicle::query()
             ->where('category_id', 2)
             ->when($request->has('search'), function ($q) use ($request) {
@@ -65,13 +62,16 @@ class LandingPageController extends Controller
             })
             ->when($request->has('brand_id') && $request->brand_id, function ($q) use ($request) {
                 $q->where('brand_id', $request->brand_id);
-            })
-            ->latest()
-            ->take(10)
-            ->get();
+            })->get();
 
         $categories = Category::all();
-        $brands = Brand::all();
+
+        // Get brands based on selected category
+        if ($request->has('category_id') && $request->category_id) {
+            $brands = Brand::where('category_id', $request->category_id)->get();
+        } else {
+            $brands = Brand::all();
+        }
 
         return view('landing_page', compact('vehicles', 'cars', 'motorcycles', 'categories', 'brands'));
     }

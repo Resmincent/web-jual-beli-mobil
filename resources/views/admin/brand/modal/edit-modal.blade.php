@@ -11,10 +11,24 @@
                     </button>
                 </div>
                 <div class="modal-body">
+                    <!-- Nama Brand -->
                     <div class="form-group">
                         <label for="name-{{ $brand->id }}">Nama Brand</label>
                         <input type="text" class="form-control" id="name-{{ $brand->id }}" name="name" value="{{ $brand->name }}" required>
                     </div>
+
+                    <!-- Kategori -->
+                    <div class="form-group">
+                        <label for="category_id" class="form-label d-block">Kategori</label>
+                        @foreach($categories as $category)
+                        <div class="form-check">
+                            <input name="category_id" class="form-check-input @error('category_id') is-invalid @enderror" type="radio" value="{{ $category->id }}" id="category{{ $category->id }}" {{ old('category_id', $brand->category_id) == $category->id ? 'checked' : '' }} required>
+                            <label class="form-check-label" for="category{{ $category->id }}">{{ $category->name }}</label>
+                        </div>
+                        @endforeach
+                    </div>
+
+                    <!-- Cover -->
                     <div class="form-group">
                         <label for="cover-{{ $brand->id }}">Cover</label>
                         <input type="file" class="form-control" id="cover-{{ $brand->id }}" name="cover">

@@ -7,6 +7,7 @@ use App\Providers\RouteServiceProvider;
 use App\Models\User;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class RegisterController extends Controller
@@ -71,5 +72,18 @@ class RegisterController extends Controller
             'email' => $data['email'],
             'password' => $data['password'],
         ]);
+    }
+
+    // Override the registered method
+    protected function registered(Request $request, $user)
+    {
+        // Check if the user is not an admin
+        if (!$user->is_admin) {
+            // Redirect to landing page
+            return redirect()->route('landing');
+        }
+
+        // Default redirect if the user is an admin
+        return redirect()->intended($this->redirectPath());
     }
 }

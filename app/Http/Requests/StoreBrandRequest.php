@@ -24,7 +24,7 @@ class StoreBrandRequest extends FormRequest
         return [
             'cover' => 'required',
             'name' => 'required',
-
+            'category_id' => 'required|exists:categories,id',
         ];
     }
 }

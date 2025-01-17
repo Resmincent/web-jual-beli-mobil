@@ -93,6 +93,15 @@
                         <input type="text" class="form-control" id="name" name="name" required>
                     </div>
                     <div class="form-group">
+                        <label for="category_id" class="form-label d-block">Kategori</label>
+                        @foreach($categories as $category)
+                        <div class="form-check">
+                            <input name="category_id" class="form-check-input @error('category_id') is-invalid @enderror" type="radio" value="{{ $category->id }}" id="category{{ $category->id }}" {{ old('category_id') == $category->id ? 'checked' : '' }} required>
+                            <label class="form-check-label" for="category{{ $category->id }}">{{ $category->name }}</label>
+                        </div>
+                        @endforeach
+                    </div>
+                    <div class="form-group">
                         <label for="cover">Cover</label>
                         <input type="file" class="form-control" id="cover" name="cover" required>
                     </div>

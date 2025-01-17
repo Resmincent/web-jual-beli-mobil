@@ -49,7 +49,7 @@
     </div>
 
     {{-- Section Mobil --}}
-    <div id="mobil" class="section-wrapper mt-5">
+    <div id="mobil" class="section-wrapper mt-5" style="{{ (!request('category_id') || request('category_id') == 1) ? '' : 'display: none' }}">
         <div class="section-header">
             <h2 class="section-title">Mobil</h2>
             <p class="section-subtitle text-center mb-4">Koleksi mobil terbaik untuk kenyamanan berkendara Anda</p>
@@ -86,7 +86,7 @@
     </div>
 
     {{-- Section Motor --}}
-    <div id="motor" class="section-wrapper mt-5">
+    <div id="motor" class="section-wrapper mt-5" style="{{ (!request('category_id') || request('category_id') == 2) ? '' : 'display: none' }}">
         <div class="section-header">
             <h2 class="section-title">Motor</h2>
             <p class="section-subtitle text-center mb-4">Pilihan motor berkualitas untuk mobilitas yang lebih gesit</p>
