@@ -38,7 +38,7 @@
                 <div class="sidebar-brand-icon rotate-n-15">
                     <i class="fas fa-car"></i>
                 </div>
-                <div class="sidebar-brand-text mx-3">Decle</div>
+                <div class="sidebar-brand-text mx-3">DANAR GARAGE</div>
             </a>
 
             <!-- Divider -->
