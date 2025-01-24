@@ -81,7 +81,7 @@ class LandingPageController extends Controller
     {
         $vehicle = Vehicle::with('brands', 'categories')->findOrFail($id);
 
-        $whatsappNumber = preg_replace('/[^0-9]/', '', '6287888129093');
+        $whatsappNumber = preg_replace('/[^0-9]/', '', '6289699830712');
 
         $message = "Halo, saya tertarik dengan kendaraan berikut:\n\n" .
             "Nama: {$vehicle->name}\n" .
